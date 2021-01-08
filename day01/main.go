@@ -12,12 +12,16 @@ import (
 func main() {
 	input := readInput()
 	sort.Ints(input)
-	fmt.Println("input:", input)
-	i, j, err := findPair(&input, 2020)
+
+	i, j, err := findPair(input, 2020)
 	check(err)
-	product := input[i] * input[j]
 	fmt.Println(input[i], "+", input[j], "= 2020")
-	fmt.Println(input[i], "*", input[j], "=", product)
+	fmt.Println(input[i], "*", input[j], "=", input[i]*input[j])
+
+	i, j, k, err := findTriple(input, 2020)
+	check(err)
+	fmt.Println(input[i], "+", input[j], "+", input[k], "= 2020")
+	fmt.Println(input[i], "*", input[j], "*", input[k], "=", input[i]*input[j]*input[k])
 }
 
 func readInput() []int {
@@ -38,8 +42,7 @@ func check(err error) {
 	}
 }
 
-func findPair(ptr *[]int, target int) (int, int, error) {
-	input := *ptr
+func findPair(input []int, target int) (int, int, error) {
 	i := 0
 	j := len(input) - 1
 
@@ -52,9 +55,22 @@ func findPair(ptr *[]int, target int) (int, int, error) {
 		} else if sum > target {
 			j = j - 1
 		} else {
-			panic("This shouldn't happen")
+			panic("this shouldn't happen")
 		}
 	}
 
-	return 0, 0, errors.New("not found")
+	return 0, 0, errors.New("pair not found")
+}
+
+func findTriple(input []int, target int) (int, int, int, error) {
+	for i := 0; i < len(input)-3; i++ {
+		remainingInput := input[i+1:]
+		remainingTarget := target - input[i]
+		j, k, err := findPair(remainingInput, remainingTarget)
+		if err == nil {
+			return i, i + j + 1, i + k + 1, nil
+		}
+	}
+
+	return 0, 0, 0, errors.New("triple not found")
 }
